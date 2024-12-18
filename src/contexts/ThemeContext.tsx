@@ -1,7 +1,6 @@
-// src/contexts/ThemeContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark' | 'system';
+type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
 	theme: Theme;
@@ -13,37 +12,23 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
 	const [theme, setTheme] = useState<Theme>(() => {
 		if (typeof window !== 'undefined') {
-			return (localStorage.getItem('theme') as Theme) || 'system';
+			// localStorage에서 테마 확인
+			const savedTheme = localStorage.getItem('theme') as Theme;
+			if (savedTheme) return savedTheme;
+
+			// 시스템 테마 확인
+			return window.matchMedia('(prefers-color-scheme: dark)').matches
+				? 'dark'
+				: 'light';
 		}
-		return 'system';
+		return 'light';
 	});
 
 	useEffect(() => {
-		function updateTheme() {
-			const root = window.document.documentElement;
-			const systemDark = window.matchMedia(
-				'(prefers-color-scheme: dark)'
-			).matches;
-
-			root.classList.remove('dark');
-
-			const effectiveTheme =
-				theme === 'system' ? (systemDark ? 'dark' : 'light') : theme;
-
-			if (effectiveTheme === 'dark') {
-				root.classList.add('dark');
-			}
-
-			localStorage.setItem('theme', theme);
-		}
-
-		updateTheme();
-
-		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-		const handler = () => updateTheme();
-		mediaQuery.addEventListener('change', handler);
-
-		return () => mediaQuery.removeEventListener('change', handler);
+		const root = window.document.documentElement;
+		root.classList.remove('dark', 'light');
+		root.classList.add(theme);
+		localStorage.setItem('theme', theme);
 	}, [theme]);
 
 	return (
