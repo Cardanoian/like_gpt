@@ -37,8 +37,6 @@ export class ChatController {
 	}
 
 	async sendMessage(message: string, fileData?: FileData) {
-		const currentMessages = this.model.getMessages();
-
 		// 사용자 메시지 추가
 		this.model.addMessage({
 			role: 'user',
@@ -52,15 +50,16 @@ export class ChatController {
 		});
 
 		try {
-			// AI 응답을 위한 빈 메시지 추가
 			const assistantMessageId = this.model.addMessage({
 				role: 'assistant',
 				content: '',
 			});
 
-			const stream = this.openaiService.processTextMessageStream(
-				currentMessages,
-				message,
+			// 새 메시지 목록 가져오기 (방금 추가한 메시지 포함)
+			const updatedMessages = this.model.getMessages();
+
+			const stream = this.openaiService.processMessageStream(
+				updatedMessages,
 				this.abortController?.signal
 			);
 

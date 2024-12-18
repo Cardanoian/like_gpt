@@ -1,12 +1,16 @@
-// src/views/components/ChatInput.tsx
 import React, { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import { Send, Paperclip, X, StopCircle } from 'lucide-react';
+import jschardet from 'jschardet';
 import { FileData } from '../../models/types';
 
 interface Props {
 	onSend: (message: string, fileData?: FileData) => Promise<void>;
 	onStop: () => void;
 	isGenerating: boolean;
+}
+
+interface CsvRow {
+	[key: string]: string;
 }
 
 export const ChatInput: React.FC<Props> = ({
@@ -54,18 +58,113 @@ export const ChatInput: React.FC<Props> = ({
 	};
 
 	const readFileContent = async (file: File): Promise<string> => {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onload = (event) => {
-				if (event.target?.result) {
-					resolve(event.target.result.toString());
-				} else {
-					reject(new Error('Failed to read file'));
+		// 먼저 파일을 바이너리로 읽어서 인코딩 감지
+		const detectEncoding = async (file: File): Promise<string> => {
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					if (e.target?.result instanceof ArrayBuffer) {
+						const uint8Array = new Uint8Array(e.target.result);
+						// uint8Array를 문자열로 변환
+						const binaryString = Array.from(uint8Array)
+							.map((byte) => String.fromCharCode(byte))
+							.join('');
+						const result = jschardet.detect(binaryString);
+						resolve(result.encoding || 'UTF-8');
+					}
+				};
+				reader.onerror = () =>
+					reject(new Error('인코딩 감지 중 오류가 발생했습니다.'));
+				reader.readAsArrayBuffer(file.slice(0, 4096));
+			});
+		};
+
+		// 감지된 인코딩으로 파일 읽기
+		const readWithEncoding = async (
+			file: File,
+			encoding: string
+		): Promise<string> => {
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = (event) => {
+					try {
+						const result = event.target?.result;
+						if (!result) {
+							throw new Error('Failed to read file');
+						}
+
+						// CSV 파일인 경우 JSON으로 변환
+						if (file.name.endsWith('.csv')) {
+							const text = result.toString();
+							const lines = text.split(/\r\n|\n/).filter((line) => line.trim());
+							if (lines.length === 0) {
+								throw new Error('빈 CSV 파일입니다.');
+							}
+
+							// 헤더 추출
+							const headers = lines[0].split(',').map((h) => h.trim());
+
+							// 전체 데이터를 JSON으로 변환
+							const jsonData = lines.slice(1).map((line) => {
+								const values = line.split(',');
+								return headers.reduce<CsvRow>((obj, header, index) => {
+									obj[header] = values[index]?.trim() || '';
+									return obj;
+								}, {});
+							});
+
+							return resolve(
+								`첨부파일 내용:\n${JSON.stringify(jsonData, null, 2)}`
+							);
+						}
+
+						// TXT 파일인 경우
+						if (file.name.endsWith('.txt')) {
+							const text = result.toString();
+
+							return resolve(`첨부파일 내용:
+${text}`);
+						}
+					} catch (error) {
+						reject(new Error(`파일 처리 중 오류가 발생했습니다.\n${error}`));
+					}
+				};
+
+				reader.onerror = () =>
+					reject(new Error('파일을 읽는 중 오류가 발생했습니다.'));
+
+				reader.readAsText(file, encoding);
+			});
+		};
+
+		try {
+			const detectedEncoding = await detectEncoding(file);
+			console.log(`감지된 인코딩: ${detectedEncoding}`);
+
+			// 첫 번째로 감지된 인코딩으로 시도
+			try {
+				return await readWithEncoding(file, detectedEncoding);
+			} catch (error) {
+				// 첫 번째 시도가 실패하면 대체 인코딩으로 재시도
+				const fallbackEncodings = ['UTF-8', 'CP949', 'EUC-KR'];
+				for (const encoding of fallbackEncodings) {
+					if (encoding !== detectedEncoding) {
+						try {
+							return await readWithEncoding(file, encoding);
+						} catch (error) {
+							console.error(error);
+							continue;
+						}
+					}
 				}
-			};
-			reader.onerror = () => reject(reader.error);
-			reader.readAsText(file);
-		});
+				throw error;
+			}
+		} catch (error) {
+			console.error('파일 읽기 오류:', error);
+			throw new Error(
+				'파일을 읽을 수 없습니다. 파일이 손상되었거나 지원하지 않는 형식일 수 있습니다.'
+			);
+		}
 	};
 
 	const handleTextareaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -123,9 +222,9 @@ export const ChatInput: React.FC<Props> = ({
 					onChange={handleTextareaChange}
 					onKeyDown={handleKeyDown}
 					placeholder='메시지를 입력하세요...'
-					className='flex-1 p-2 border dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none min-h-[40px] max-h-[200px] overflow-y-auto'
+					className='flex-1 p-2 border dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none min-h-[40px] max-h-[160px] overflow-y-auto'
+					style={{ height: '40px' }} // 초기 높이를 40px로 설정
 					rows={1}
-					style={{ height: 'auto' }}
 				/>
 				<label className='p-2 border dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700'>
 					<input

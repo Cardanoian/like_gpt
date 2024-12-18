@@ -41,16 +41,16 @@ export const ChatView: React.FC = () => {
 	};
 
 	return (
-		<div className='flex flex-col h-screen bg-gray-50 dark:bg-gray-900'>
-			<div className='bg-white dark:bg-gray-800 border-b dark:border-gray-700 p-4'>
+		<div className='flex flex-col h-[var(--app-height)] max-h-[var(--app-height)] overflow-hidden'>
+			<div className='flex-none bg-white dark:bg-gray-800 border-b dark:border-gray-700 p-4'>
 				<div className='max-w-4xl mx-auto flex items-center'>
 					<div className='flex-1 flex justify-center items-center gap-2'>
 						<img
 							src='/chatg1pt.svg'
 							alt='ChatG1PT Logo'
-							className='h-12 w-12'
+							className='h-10 w-10'
 						/>
-						<h1 className='text-xl font-semibold text-gray-900 dark:text-white'>
+						<h1 className='text-[30px] font-bold text-gray-900 dark:text-white'>
 							ChatG1PT
 						</h1>
 					</div>
@@ -67,7 +67,7 @@ export const ChatView: React.FC = () => {
 				<div ref={messagesEndRef} />
 			</div>
 
-			<div className='border-t dark:border-gray-700 bg-white dark:bg-gray-800 p-4'>
+			<div className='flex-none border-t dark:border-gray-700 bg-white dark:bg-gray-800 p-4'>
 				<ChatInput
 					onSend={handleSend}
 					onStop={handleStop}

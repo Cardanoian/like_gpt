@@ -4,6 +4,9 @@ export default {
 	darkMode: 'class',
 	theme: {
 		extend: {
+			fontFamily: {
+				sans: ['"Noto Sans"', '"Noto Sans KR"', 'system-ui', 'sans-serif'],
+			},
 			animation: {
 				'bounce-slow': 'bounce 1.5s infinite',
 			},
