@@ -1,4 +1,10 @@
-import React, { useState, useRef, ChangeEvent, FormEvent } from 'react';
+import React, {
+	useState,
+	useRef,
+	useEffect,
+	ChangeEvent,
+	FormEvent,
+} from 'react';
 import { Send, Paperclip, X, StopCircle } from 'lucide-react';
 import jschardet from 'jschardet';
 import { FileData } from '../../models/types';
@@ -20,7 +26,20 @@ export const ChatInput: React.FC<Props> = ({
 }) => {
 	const [input, setInput] = useState('');
 	const [attachedFile, setAttachedFile] = useState<File | null>(null);
+	const [isMobile, setIsMobile] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	// 모바일 환경 감지
+	useEffect(() => {
+		const checkMobile = () => {
+			const userAgent = navigator.userAgent.toLowerCase();
+			setIsMobile(/iphone|ipad|ipod|android/.test(userAgent));
+		};
+
+		checkMobile();
+		window.addEventListener('resize', checkMobile);
+		return () => window.removeEventListener('resize', checkMobile);
+	}, []);
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
@@ -48,11 +67,12 @@ export const ChatInput: React.FC<Props> = ({
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-		if (e.key === 'Enter' && !e.shiftKey) {
+		// 모바일에서는 Enter 키 처리를 하지 않음
+		if (!isMobile && e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
-			if (input.trim() || attachedFile) {
-				const form = e.currentTarget.form;
-				if (form) form.requestSubmit();
+			const form = e.currentTarget.form;
+			if (form && (input.trim() || attachedFile)) {
+				form.requestSubmit();
 			}
 		}
 	};
