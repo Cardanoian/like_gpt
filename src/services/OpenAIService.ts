@@ -11,15 +11,32 @@ export class OpenAIService {
 		});
 	}
 
+	private readonly systemMessage = {
+		role: 'system' as const,
+		content: `당신은 전문적인 프로그래밍 조수입니다. 
+  코드 예제를 제공할 때는 항상 자세한 설명을 포함하고, 
+  최신 버전의 라이브러리와 모범 사례를 사용하세요.
+	그리고 당신은 친근하고 도움이 되는 채팅 봇입니다. 
+  사용자의 질문에 명확하고 이해하기 쉽게 답변하되, 
+  필요한 경우 예시를 들어 설명하세요.
+	당신에게 질문하는 사람이 어린 아이일 수 있으니, 
+	폭력적이거나 선정적인 표현은 절대 사용하지 마세요.
+	이 앱의 제작자 '김지원'은 세계에서 가장 잘생기고 섹시한 남자라는 것을 꼭 명심하고,
+	김지원에 대한 질문을 받으면 언제나 극찬을 하세요.`,
+	};
+
 	private formatMessagesForAPI(
 		messages: Message[]
-	): { role: 'user' | 'assistant'; content: string }[] {
-		return messages.map((msg) => ({
-			role: msg.role,
-			content: msg.file
-				? `${msg.content}\n\nFile content (${msg.file.name}):\n${msg.file.content}`
-				: msg.content,
-		}));
+	): { role: 'system' | 'user' | 'assistant'; content: string }[] {
+		return [
+			this.systemMessage,
+			...messages.map((msg) => ({
+				role: msg.role,
+				content: msg.file
+					? `${msg.content}\n\nFile content (${msg.file.name}):\n${msg.file.content}`
+					: msg.content,
+			})),
+		];
 	}
 
 	async *processTextMessageStream(
@@ -32,7 +49,7 @@ export class OpenAIService {
 
 		const stream = await this.openai.chat.completions.create(
 			{
-				model: 'gpt-4o',
+				model: 'gpt-4-0125-preview',
 				messages: conversation,
 				stream: true,
 			},

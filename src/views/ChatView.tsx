@@ -45,7 +45,11 @@ export const ChatView: React.FC = () => {
 			<div className='bg-white dark:bg-gray-800 border-b dark:border-gray-700 p-4'>
 				<div className='max-w-4xl mx-auto flex items-center'>
 					<div className='flex-1 flex justify-center items-center gap-2'>
-						<img src='/chatg1pt.svg' alt='ChatG1PT Logo' className='h-6 w-6' />
+						<img
+							src='/chatg1pt.svg'
+							alt='ChatG1PT Logo'
+							className='h-12 w-12'
+						/>
 						<h1 className='text-xl font-semibold text-gray-900 dark:text-white'>
 							ChatG1PT
 						</h1>
