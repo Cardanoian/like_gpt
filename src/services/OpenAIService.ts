@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { Message } from '../models/types';
 
 export class OpenAIService {
-	private readonly MODEL = 'gpt-4o-mini';
+	private readonly MODEL = 'gpt-4o';
 	private openai: OpenAI;
 	private readonly systemMessage = {
 		role: 'system' as const,
