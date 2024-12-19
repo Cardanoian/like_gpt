@@ -28,7 +28,7 @@ export class OpenAIService {
 	): { role: 'system' | 'user' | 'assistant'; content: string }[] {
 
 		return [
-			systemMessage,
+			this.systemMessage,
 			...messages.map((msg) => {
 				let content = msg.content;
 				// 파일이 있는 경우 내용을 포함
