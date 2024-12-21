@@ -9,8 +9,6 @@ interface Props {
 }
 
 export const ChatMessage: React.FC<Props> = ({ message }) => {
-	console.log(message);
-	// message.content = message.content.replace('\\', '\\\\');
 	return (
 		<div
 			className={`fade-in flex ${
