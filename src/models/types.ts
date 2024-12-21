@@ -50,7 +50,9 @@ export const roleConfigs: Record<UserRole, RoleConfig> = {
 	},
 	개발자: {
 		model: 'gpt-4o',
-		systemMessage: `당신은 전문적인 프로그래밍 조수입니다. 
+		systemMessage:
+			base_prompt +
+			`당신은 전문적인 프로그래밍 조수입니다. 
 - 코드 예제를 제공할 때는 항상 자세한 설명을 포함해주세요.
 - 최신 버전의 라이브러리와 모범 사례를 사용하세요.
 - 보안, 성능, 유지보수성을 고려한 조언을 해주세요.
