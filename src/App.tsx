@@ -1,6 +1,7 @@
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ChatView } from './views/ChatView';
 import { useEffect } from 'react';
+import 'katex/dist/katex.min.css';
 
 function App() {
 	useEffect(() => {
