@@ -2,14 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
 import { ChatController } from '../controllers/ChatController';
-import { Message } from '../models/types';
+import { UserRole, Message } from '../models/types';
 import { ThemeToggle } from './components/ThemeToggle';
+import { RoleSelect } from './components/RoleSelect';
 
 export const ChatView: React.FC = () => {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isGenerating, setIsGenerating] = useState(false);
+	const [currentRole, setCurrentRole] = useState<UserRole>('학생');
 	const controller = useRef(new ChatController()).current;
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+
+	const handleRoleChange = (newRole: UserRole) => {
+		setCurrentRole(newRole);
+		controller.setRole(newRole);
+		setMessages([]); // 메시지 초기화
+	};
 
 	useEffect(() => {
 		const unsubscribe = controller.subscribe(() => {
@@ -42,14 +50,18 @@ export const ChatView: React.FC = () => {
 
 	return (
 		<div className='flex flex-col h-[var(--app-height)] max-h-[var(--app-height)] overflow-hidden'>
+			{/* 헤더 */}
 			<div className='flex-none bg-white dark:bg-gray-800 border-b dark:border-gray-700 p-4'>
 				<div className='max-w-4xl mx-auto flex items-center'>
-					<div className='flex-1 flex justify-center items-center gap-2'>
-						<img
-							src='/chatg1pt.svg'
-							alt='ChatG1PT Logo'
-							className='h-10 w-10'
+					<div className='flex items-center gap-4'>
+						<RoleSelect
+							currentRole={currentRole}
+							onRoleChange={handleRoleChange}
+							setMessages={setMessages}
 						/>
+					</div>
+					<div className='flex-1 flex justify-center items-center gap-2'>
+						<img src='/chatg1pt.svg' alt='ChatG1PT' className='h-10 w-10' />
 						<h1 className='text-[30px] font-bold text-gray-900 dark:text-white'>
 							ChatG1PT
 						</h1>

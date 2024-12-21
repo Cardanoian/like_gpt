@@ -243,7 +243,10 @@ ${text}`);
 					onKeyDown={handleKeyDown}
 					placeholder='메시지를 입력하세요...'
 					className='flex-1 p-2 border dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none min-h-[40px] max-h-[160px] overflow-y-auto'
-					style={{ height: '40px' }} // 초기 높이를 40px로 설정
+					style={{
+						height: '40px', // 기본 높이
+						overflowY: input.trim() ? 'auto' : 'hidden',
+					}} // 초기 높이를 40px로 설정
 					rows={1}
 				/>
 				<label className='p-2 border dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700'>

@@ -1,6 +1,6 @@
 import { ChatModel } from '../models/ChatModel';
 import { OpenAIService } from '../services/OpenAIService';
-import { FileData } from '../models/types';
+import { FileData, UserRole } from '../models/types';
 
 export class ChatController {
 	private model: ChatModel;
@@ -18,6 +18,11 @@ export class ChatController {
 
 	subscribe(listener: () => void) {
 		return this.model.subscribe(listener);
+	}
+
+	setRole(role: UserRole) {
+		this.openaiService.setRole(role);
+		this.model.clear();
 	}
 
 	async readFileContent(file: File): Promise<string> {
