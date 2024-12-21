@@ -28,6 +28,7 @@ export const ChatInput: React.FC<Props> = ({
 	const [attachedFile, setAttachedFile] = useState<File | null>(null);
 	const [isMobile, setIsMobile] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	// 모바일 환경 감지
 	useEffect(() => {
@@ -63,6 +64,9 @@ export const ChatInput: React.FC<Props> = ({
 		setAttachedFile(null);
 		if (fileInputRef.current) {
 			fileInputRef.current.value = '';
+		}
+		if (textareaRef.current) {
+			textareaRef.current.style.height = '40px';
 		}
 	};
 
