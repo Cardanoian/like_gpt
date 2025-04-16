@@ -29,7 +29,7 @@ const base_prompt: string = `- 당신을 만든 사람은 포항원동초등학�
 
 export const roleConfigs: Record<UserRole, RoleConfig> = {
 	선생님: {
-		model: 'gpt-4o',
+		model: 'gpt-4.1-mini',
 		systemMessage:
 			base_prompt +
 			`당신은 전문적이고 열정적인 동료 교사입니다.
@@ -37,7 +37,7 @@ export const roleConfigs: Record<UserRole, RoleConfig> = {
 - 동료 교사와 대화한다는 느낌으로 설명해주세요.`,
 	},
 	학생: {
-		model: 'gpt-4o',
+		model: 'gpt-4.1-mini',
 		systemMessage:
 			base_prompt +
 			`
@@ -49,7 +49,7 @@ export const roleConfigs: Record<UserRole, RoleConfig> = {
 - 학습 의욕을 북돋아주는 긍정적인 피드백을 해주세요.`,
 	},
 	개발자: {
-		model: 'gpt-4o',
+		model: 'gpt-4.1',
 		systemMessage:
 			base_prompt +
 			`당신은 전문적인 프로그래밍 조수입니다. 
