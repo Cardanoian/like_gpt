@@ -250,7 +250,7 @@ ${text}`);
           className='flex-1 p-2 border dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none min-h-[40px] max-h-[160px] overflow-y-auto'
           style={{
             height: '40px', // 기본 높이
-            overflowY: input.trim() ? 'auto' : 'hidden',
+            overflowY: input.trim().split('\n').length > 1 ? 'auto' : 'hidden',
           }} // 초기 높이를 40px로 설정
           ref={textareaRef}
           rows={1}
